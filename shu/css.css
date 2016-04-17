@@ -1,0 +1,21 @@
+form {
+    display: block;
+}
+
+ul {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+#recordTemplate { display: none; }
+
+a {
+  color: red;
+  display: inline-block;
+    padding: 2px;
+    border: 1px solid #ddd;
+}
+
+a:hover {
+   background-color: #ffc; 
+}
