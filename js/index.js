@@ -1,55 +1,66 @@
-var img2fire = angular.module('img2fire', ['firebase', 'angular.filter']);
-img2fire.controller("base64Ctrl", function($scope, $firebaseArray) {
-  var ref = new Firebase("https://luminous-torch-9179.firebaseio.com/");
-  var img = new Firebase("https://luminous-torch-9179.firebaseio.com/images");
-  $scope.imgs = $firebaseArray(img);
-  var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
-  $scope.uploadFile = function() {
-    var sFileName = $("#nameImg").val();
-    if (sFileName.length > 0) {
-      var blnValid = false;
-      for (var j = 0; j < _validFileExtensions.length; j++) {
-        var sCurExtension = _validFileExtensions[j];
-        if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
-          blnValid = true;
-          var filesSelected = document.getElementById("nameImg").files;
-          if (filesSelected.length > 0) {
-            var fileToLoad = filesSelected[0];
-            var fileReader = new FileReader();
-            fileReader.onload = function(fileLoadedEvent) {
-              var textAreaFileContents = document.getElementById(
-                "textAreaFileContents"
-              );
-              $scope.imgs.$add({
-                date: Firebase.ServerValue.TIMESTAMP,
-                base64: fileLoadedEvent.target.result
-              });
-            };
-            fileReader.readAsDataURL(fileToLoad);
-          }
-          break;
+/**
+ * Created by Kupletsky Sergey on 16.09.14.
+ *
+ * Hierarchical timing
+ * Add specific delay for CSS3-animation to elements.
+ */
+
+(function($) {
+    var speed = 2000;
+    var container =  $('.display-animation');
+    container.each(function() {
+        var elements = $(this).children();
+        elements.each(function() {
+            var elementOffset = $(this).offset();
+            var offset = elementOffset.left*0.8 + elementOffset.top;
+            var delay = parseFloat(offset/speed).toFixed(2);
+            $(this)
+                .css("-webkit-animation-delay", delay+'s')
+                .css("-o-animation-delay", delay+'s')
+                .css("animation-delay", delay+'s')
+                .addClass('animated');
+        });
+    });
+})(jQuery);
+
+/**
+ * Created by Kupletsky Sergey on 04.09.14.
+ *
+ * Ripple-effect animation
+ * Tested and working in: ?IE9+, Chrome (Mobile + Desktop), ?Safari, ?Opera, ?Firefox.
+ * JQuery plugin add .ink span in element with class .ripple-effect
+ * Animation work on CSS3 by add/remove class .animate to .ink span
+*/
+
+(function($) {
+    $(".ripple-effect").click(function(e){
+        var rippler = $(this);
+
+        // create .ink element if it doesn't exist
+        if(rippler.find(".ink").length == 0) {
+            rippler.append("<span class='ink'></span>");
         }
-      }
-      if (!blnValid) {
-        alert('文件无效');
-        return false;
-      }
-    }
-    return true;
-  }
-  $scope.deleteimg = function(imgid) {
-    var misimg = new Firebase("https://luminous-torch-9179.firebaseio.com/images/" + imgid);
-    var r = confirm("你想删除此图片 ?");
-    if (r == true) {
-      misimg.remove();
-      var onComplete = function(error) {
-        if (error) {
-          console.log('无法上传图片');
-        } else {
-          console.log('该图像是成功上传');
+
+        var ink = rippler.find(".ink");
+
+        // 防止快速双击
+        ink.removeClass("animate");
+
+        // 集墨直径。
+        if(!ink.height() && !ink.width())
+        {
+            var d = Math.max(rippler.outerWidth(), rippler.outerHeight());
+            ink.css({height: d, width: d});
         }
-      };
-      misimg.remove(onComplete);
-    }
-  }
-});
+
+        // get click coordinates
+        var x = e.pageX - rippler.offset().left - ink.width()/2;
+        var y = e.pageY - rippler.offset().top - ink.height()/2;
+
+        // set .ink position and add class .animate
+        ink.css({
+            top: y+'px',
+            left:x+'px'
+        }).addClass("animate");
+    })
+})(jQuery);
