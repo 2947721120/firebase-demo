@@ -1,0 +1,183 @@
+body{
+    margin: 0;
+    background: #AEBDFB;
+}
+
+h1{
+  font-family: cursive;
+  color: cornsilk;
+}
+
+hr{
+  border: 0;
+  border-bottom: 1px dotted #212121;
+  background: #AEBDFB;
+  margin: 15px 0;
+}
+
+#app{
+    text-align: center;
+}
+
+.input{
+    display: inline-block;
+}
+
+.input input[type=text]{
+    outline: none;
+    width: 200px;
+    border-radius: 8px;
+    padding: 0 35px 0 10px;
+    font-size: 1em;
+    height: 28px;
+    border: 3px solid #89a0ff;
+    box-shadow: 1px 1px 8px #000;
+}
+
+.input input[type=button]{
+    outline: none;
+    margin-left: -30px;
+    border: none;
+    width: 30px;
+    height: 34px;
+    color: cornsilk;
+    font-size: 1.2em;
+    font-weight: bolder;
+    border-radius: 0 9px 9px 0;
+    background: #89a0ff;
+    position: absolute;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.input input[type=button]:hover{
+    color: #212121;
+}
+
+.deleteAll,
+.clearAll{
+    opacity: 0;
+    display: inline-block;
+    pointer-events: none;
+    transition: 0.3s;
+}
+
+.deleteAll.show,
+.clearAll.show{
+    opacity: 1;
+    pointer-events: auto;
+    margin-bottom: 30px;
+}
+
+.clearAll{
+  margin-left: 10px;
+}
+
+.deleteAll input[type=button],
+.clearAll input[type=button]{
+    display: inline-block;
+    outline: none;
+    border: none;
+    width: 110px;
+    height: 26px;
+    color: cornsilk;
+    border-radius: 9px;
+    background: #80d169;
+    cursor: pointer;
+    transition: 0.5s;
+    box-shadow: 1px 1px 5px #000;
+}
+
+.clearAll input[type=button]{
+    background: #e66e7c;
+    width: 80px;
+}
+
+.deleteAll input[type=button]:hover,
+.clearAll input[type=button]:hover{
+    color: #212121;
+}
+
+.deleteAll input[type=button]:active,
+.clearAll input[type=button]:active{
+    box-shadow: none;
+}
+
+.component{
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.component input[type=checkbox]{
+  position: relative;
+  top: 2px;
+  cursor: pointer;
+  left: -5px;
+}
+
+.component input[type=text]{
+    outline: none;
+    border: none;
+    padding: 0 35px 0 10px;
+    width: 65%;
+    max-width: 300px;
+    font-size: 1em;
+    height: 28px;
+    border-radius: 8px;
+    transition: 0.5s;
+    box-shadow: 1px 1px 8px #000;
+}
+
+.component input[type=button]{
+    position: absolute;
+    outline: none;
+    margin-left: -35px;
+    border: none;
+    width: 36px;
+    font-size: 1em;
+    height: 28px;
+    border-radius: 0 8px 8px 0;
+    color: cornsilk;
+    background: #e66e7c;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.component input[type=button]:hover{
+    color: #212121;
+}
+
+.lineThrough{
+    text-decoration: line-through;
+}
+
+.listComponent{
+    opacity: 0;
+    width: 100%;
+    display: inline-block;
+    transition: opacity 0.3s;
+    padding-top: 20px;
+    padding-bottom: 5px;
+}
+
+.listComponent.show{
+    opacity: 1;
+}
+
+.list-enter{
+    opacity: 0;
+}
+
+.list-enter.list-enter-active{
+    opacity: 1;
+    transition: opacity 300ms ease-in;
+}
+
+.list-leave {
+    opacity: 1;
+}
+
+.list-leave.list-leave-active {
+    opacity: 0;
+    transition: opacity 300ms ease-in;
+}

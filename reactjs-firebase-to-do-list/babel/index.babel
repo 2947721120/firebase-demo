@@ -1,0 +1,223 @@
+var rootUrl = 'https://massimo.firebaseio.com/';
+var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
+var Input = React.createClass({
+    render: function(){
+        return(
+            <div className="input">
+                <h1>To-Do:</h1>
+                <input type="text" placeholder="new to-do item" 
+                  value={this.props.val} 
+                  onChange={this.props.change}
+                />
+                <input type="button" value="+" 
+                  onClick={this.props.action} 
+                />
+                <hr/>
+            </div>
+        )
+    }
+});
+
+var ClearBtn = React.createClass({
+    render: function(){
+        return(
+            <div className={"clearAll " +
+              (this.props.show ? 'show' : '')}>
+                <input type="button" value="Delete all" 
+                  onClick={this.props.clear} />
+            </div>
+        )
+    }
+});
+
+var DeleteBtn = React.createClass({
+    render: function(){
+        return(
+            <div className={"deleteAll " +
+              (this.props.show ? 'show' : '')}>
+                <input type="button" value="Delete selected"
+                  onClick={this.props.deleteAll}
+                />
+            </div>
+        )
+    }
+});
+
+var Component = React.createClass({
+    getInitialState: function(){
+      return({
+        text: this.props.item.text,
+        done: this.props.item.done
+      })
+    },
+
+    checking: function(event){
+        var updated = {done: event.target.checked};
+        this.setState(updated);
+        this.firebase.update(updated);
+    },
+
+    componentWillMount: function(){
+        this.firebase = new Firebase(
+          rootUrl + 'items/' + this.props.item.key
+        )
+    },
+
+    editing: function(event){
+        this.setState({text: event.target.value});
+    },
+
+    deleting: function(){
+        this.firebase.remove();
+    },
+
+    saving: function(){
+        this.firebase.update({text: this.state.text});
+    },
+
+    render: function(){
+        return(
+            <div className="component">
+               <input type="checkbox" 
+                   checked={this.state.done}
+                   onChange={this.checking} 
+               />
+               <input type="text" 
+                      className={this.state.done ? 'lineThrough' : ''}
+                      disabled={this.state.done}
+                      value={this.state.text}
+                      onChange={this.editing}
+                      onBlur={this.saving}
+               />
+               <input type="button" value="x"
+                 onClick={this.deleting} 
+               />
+            </div>
+        )
+    }
+});
+
+var ListComponent = React.createClass({
+    rendering: function(){
+        var itemsList = [];
+        if(this.props.items && 
+           Object.keys(this.props.items) != 0){
+            for (var key in this.props.items){
+                if (key == '.key' || key=='.value')
+                    continue;
+                if (this.props.items.hasOwnProperty(key)){
+                    var item = this.props.items[key];
+                        item.key = key;
+
+                    itemsList.push(
+                        <Component key={key} item={item} />
+                    )
+                }
+            }
+            return itemsList;
+        }else{
+            return <div></div>
+        }
+    },
+
+    render: function(){
+        return(
+            <div className={'listComponent ' + 
+              (this.props.isLoaded ? 'show' : '')}>
+                <ReactCSSTransitionGroup 
+                  transitionName="list" 
+                  transitionEnterTimeout={300}
+                  transitionLeaveTimeout={300}>
+                 {this.rendering()}
+                </ReactCSSTransitionGroup>
+            </div>
+        )
+    }
+});
+
+var App = React.createClass({
+    mixins : [ReactFireMixin],
+
+    componentWillMount: function() {
+        this.firebase = new Firebase(rootUrl + 'items/');
+        this.bindAsObject(this.firebase,'list');
+        this.firebase.on('value',this.loaded);
+    },
+
+    getInitialState: function(){
+        return{
+            list: {},
+            inputText: '',
+            loadedData: false
+        }
+    },
+
+    changeText: function(event){
+        this.setState({
+            inputText: event.target.value
+        });
+    },
+
+    addNew: function(){
+        if(this.state.inputText.length){
+            this.firebaseRefs.list.push({
+                text: this.state.inputText,
+                done: false
+            });
+            this.setState({inputText: ''});
+        }
+    },
+
+    loaded: function(){
+        this.setState({loadedData: true});
+    },
+
+    deleteAll: function(){
+      for(var key in this.state.list){
+          if (key == '.key' || key=='.value')
+              continue;
+          if(this.state.list.hasOwnProperty(key) &&
+             this.state.list[key].done){
+              this.firebase.child(key).remove();
+          }
+      }
+    },
+
+    clear: function(){
+        for(var key in this.state.list){
+            if (key == '.key' || key=='.value')
+                continue;
+            if(this.state.list.hasOwnProperty(key)){
+                this.firebase.child(key).remove();
+            }
+        }
+    },
+
+    render: function(){
+        return(
+            <div className="container">
+                <Input val={this.state.inputText} 
+                  change={this.changeText} 
+                  action={this.addNew}
+                />
+                <ListComponent 
+                  isLoaded={this.state.loadedData} 
+                  items={this.state.list} 
+                />
+                <DeleteBtn deleteAll={this.deleteAll} 
+                  show={this.state.loadedData && 
+                        this.state.list &&
+                       !this.state.list.hasOwnProperty('.value')}
+                />
+                <ClearBtn clear={this.clear}
+                  show={this.state.loadedData &&
+                        this.state.list && 
+                       !this.state.list.hasOwnProperty('.value')}
+                />
+            </div>
+        )
+    }
+});
+
+ReactDOM.render(<App />, document.getElementById('app'));
