@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Rollie Pollie</title>
+   <!-- <script src="http://s.codepen.io/assets/libs/modernizr.js" type="text/javascript"></script>-->
+    <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/style.css">
+		 <link href="https://font.c2cmalls.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+  <body>
+    <html ng-app="angular-poll">
+	<head>
+		<title>{{AppTitle}} | 
+</title>
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="https://cdn.c2cmalls.com/bootstrap/3.3.4/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://cdnjs.c2cbc.com/ajax/libs/material-design-lite/1.0.6/material.min.css">
+		<link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue-light_blue.min.css" />
+		<!-- List with avatar and controls -->
+<style>
+.demo-list-control {
+  width: 300px;
+}
+
+.demo-list-radio {
+  display: inline;
+}
+</style>
+
+	</head>
+
+	<body ng-controller="AppCtrl">
+		<div class="container">
+			<div class="col-md-6 col-md-offset-3">
+				<div class="header">
+					<h2><a href="" sref="home">{{AppTitle}}</a></h2>
+				</div>
+				<div class="row marketing">
+					<div class="col-sm-12">
+						<div ui-view></div>
+					</div>
+				</div>
+				<footer class="footer">
+				
+				</footer>
+			</div>
+		</div>
+		<!-- TEMPLATES -->
+		<script id="templates/home.html" type="text/ng-template">	
+			<div class="panel panel-default">
+				<!-- Default panel contents -->
+				<div class="panel-heading">
+					<textarea class="form-control has-error" placeholder="投票主题。" ng-model="Poll.Question"></textarea>
+				</div>
+				<!-- List group -->
+					<ul class="list-group">
+						<li class="list-group-item option" ng-repeat="(key, Answer) in Poll.Answers">
+							<div class="input-group input-group-lg" ng-class="(key === 0 && !Answer.label) || (key === 1 && !Answer.label) ? 'has-warning' : ''">
+								<span class="input-group-addon">{{key + 1}}</span>
+								<input type="text" class="form-control" placeholder="选项 {{key + 1}}" ng-model="Answer.label">
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="button" ng-click="ClearAnswer(Answer)" ng-show="Answer.label">清空</button>
+									<button class="btn btn-danger" type="button" ng-click="RemoveAnswer(key)">X</button>
+								</span>
+							</div>
+						</li>
+						<li class="list-group-item option transparent">
+							<div class="input-group input-group-lg">
+								<span class="input-group-addon mdl-radio mdl-js-radio mdl-js-ripple-effect">{{Poll.Answer.length + 1}}</span>
+								<input type="text" class="form-control mdl-radio mdl-js-radio mdl-js-ripple-effect" placeholder="Option {{Poll.Answers.length + 1}}" disabled>
+								<span class="input-group-btn">
+									<button class="btn btn-success" type="button" ng-click="AddAnswer()">+</button>
+								</span>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="form-group">
+				<button class="btn btn-success btn-lg" type="button" ng-click="CreatePoll()" ng-disabled="!Poll.Question || (!Poll.Answers[0].label || !Poll.Answers[1].label)">创建民意调查</button>
+			</div>
+		</script>
+		<script id="templates/voting.html" type="text/ng-template">
+			<div class="panel panel-default">
+				<!-- 默认面板内容 -->
+				<div class="panel-heading">
+					<h4><small>我们的问题是：投票</small></h4>
+					<h2 ng-bind="Poll.Question"></h2>
+				</div>
+				<!-- 清单组 -->
+		
+				
+				<ul class="list-group">
+					<li class="list-group-item" class="mdl-radio mdl-js-radio mdl-js-ripple-effect" ng-repeat="Answer in Poll.Answers">
+						<div class="radio">
+						<label>
+							<input type="radio" class="mdl-radio__label" name="AnswersRadios" ng-model="MyVote.Answer" ng-value="Answer">
+							{{Answer.label}}
+						</label>
+					</div>
+					</li>
+				</ul>
+			</div>
+			<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary" ng-click="Vote()" ng-disabled="!MyVote.Answer">
+ 投票
+</button>
+			
+			<div class="form-group">
+				<h3>分享此投票</h3>
+				<input type="text" class="form-control" ng-value="PollUrl" onClick="this.select();"/>
+				<h5><kbd>left click</kbd> > <kbd>ctrl/cmd + c</kbd> 或 <kbd>left click</kbd> > <kbd>right click</kbd> > <kbd>copy</kbd></h5>
+			</div>
+		</script>
+		<script id="templates/results.html" type="text/ng-template">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4><small>results for question:</small></h4>
+					<h3 ng-bind="Poll.Question"></h3>
+				</div>
+				<div class="panel-body chart-panel">
+					<!-- ChartJS chart. -->
+					<!-- Updates in realtime with Angular & firebasebindings -->
+					<!-- open results in new tab and go back and vote again -->
+					<canvas id="ResultsChart" width="400" height="400"></canvas>
+				</div>
+				<ul class="list-group">
+					<li class="list-group-item" ng-repeat="(key, Answer) in Poll.Answers">
+						<h4>Answer {{key + 1}}: "{{Answer.label}}"</h4>
+						<p><strong>{{Answer.value || 0}}投票<span ng-if="Answer.value != 1">s</span></strong>为<em>{{(Answer.value / TotalVotes) * 100 || 0 | number: 2}}%</em>总票​​数。.</p>
+					</li>
+				</ul>
+				<div class="panel-footer">{{TotalVotes}} 总票数.</div>
+			</div>
+			<div class="form-group">
+				<h3>分享这些成果：</h3>
+				<input type="text" class="form-control" ng-value="PollUrl" onClick="this.select();"/>
+				<h5><kbd>left click</kbd> > <kbd>ctrl/cmd + c</kbd> 或 <kbd>left click</kbd> > <kbd>right click</kbd> > <kbd>copy</kbd></h5>
+			</div>
+		</script>
+		<script type="text/javascript" src="https://cdnjs.c2cbc.com/ajax/libs/material-design-lite/1.1.3/material.min.js"></script>
+		<!-- Angular -->
+		<script src="https://ajax.c2cmalls.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+		<!-- ui router -->
+		<script src="https://cdnjs.c2cbc.com/ajax/libs/angular-ui-router/0.2.14/angular-ui-router.min.js"></script>
+		<!-- Firebase -->
+		<script src="https://firebase.c2cbc.com/js/client/2.2.4/firebase.js"></script>
+		<!-- AngularFire -->
+		<script src="https://firebase.c2cbc.com/libs/angularfire/1.1.1/angularfire.min.js"></script>
+		<!-- chart.js -->
+		<script src="https://cdnjs.c2cbc.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+		<!-- ngSanitize -->
+		<script src="https://cdnjs.c2cbc.com/ajax/libs/angular.js/1.3.15/angular-sanitize.min.js"></script>
+	</body>
+</html>
+        <script src="js/index.js"></script>
+  </body>
+</html>
