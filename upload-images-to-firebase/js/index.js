@@ -1,7 +1,7 @@
 var img2fire = angular.module('img2fire', ['firebase', 'angular.filter']);
 img2fire.controller("base64Ctrl", function($scope, $firebaseArray) {
-  var ref = new Firebase("https://luminous-torch-9179.firebaseio.com/");
-  var img = new Firebase("https://luminous-torch-9179.firebaseio.com/images");
+  var ref = new Firebase("https://glowing-inferno-7011.firebaseio.com/img/");
+  var img = new Firebase("https://glowing-inferno-7011.firebaseio.com/images/");
   $scope.imgs = $firebaseArray(img);
   var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
   $scope.uploadFile = function() {
